@@ -45,6 +45,15 @@
 //! [0]
 Dialog::Dialog()
 {
+    //init window size
+    QRect rec = QApplication::desktop()->screenGeometry();
+     int height = rec.height()*0.8;
+     int width = rec.width()*0.8;
+    this->setFixedSize(width,height);
+    //ui init
+     but_start=new QPushButton("start");
+     but_stop=new QPushButton("stop");
+
     createMenu();
     createleftView();
     createrightView();
@@ -58,18 +67,18 @@ Dialog::Dialog()
 
     buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok
                                      | QDialogButtonBox::Cancel);
-
-    connect(buttonBox, SIGNAL(accepted()), this, SLOT(accept()));
-    connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
+    //bind signal and slot
+    connect(but_start, SIGNAL(clicked()), this, SLOT(onstart()));
+    connect(but_stop, SIGNAL(clicked()), this, SLOT(onstop()));
 //! [1]
 
 //! [2]
     QHBoxLayout *mainLayout = new QHBoxLayout;
 //! [2] //! [3]
-    mainLayout->setMenuBar(menuBar);
+ //   mainLayout->setMenuBar(menuBar);
 //! [3] //! [4]
- //   mainLayout->addWidget(leftView);
-    mainLayout->addWidget(rightView);
+    mainLayout->addWidget(leftView,70,0);
+    mainLayout->addWidget(rightView,30,0);
   //  mainLayout->addWidget(formGroupBox);
   //  mainLayout->addWidget(bigEditor);
 //    mainLayout->addWidget(buttonBox);
@@ -81,7 +90,12 @@ Dialog::Dialog()
     setWindowTitle(tr("Basic Layouts"));
 }
 //! [5]
+void Dialog::onstart()
+{}
+void Dialog::onstop()
+{
 
+}
 //! [6]
 void Dialog::createMenu()
 {
@@ -98,7 +112,7 @@ void Dialog::createMenu()
 //! [7]
 void Dialog::createleftView()
 {
-    leftView = new QGroupBox(tr("H!!!!orizontal layout"));
+    leftView = new QGroupBox(tr("left_layout"));
     QVBoxLayout *layout = new QVBoxLayout;
     createlefttopView();
     createleftbelowView();
@@ -114,7 +128,12 @@ void Dialog::createleftView()
 }
 void Dialog::createlefttopView()
 {
-    lefttopView=new QGroupBox(tr("left top view"));
+    QVBoxLayout
+         *layout=new QVBoxLayout;
+    layout->addWidget(new QLabel("加油次数："));
+    layout->addWidget(new QWidget);
+    lefttopView=new QGroupBox(tr("left top"));
+    lefttopView->setLayout(layout);//w=new QGroupBox(tr("left top view"));
 
 }
 void Dialog::createleftbelowView()
@@ -126,10 +145,41 @@ void Dialog::createleftbelowView()
 //! [8]
 void Dialog::createrightView()
 {
-    rightView = new QGroupBox(tr("Grid layout"));
+    rightView = new QGroupBox(tr("right layout"));
 //! [8]
+//!
     QVBoxLayout *layout = new QVBoxLayout;
+//d2_1
+    QVBoxLayout *renew_area =new QVBoxLayout();
 
+    QHBoxLayout *first_line =new QHBoxLayout();
+    first_line->addWidget(new QLabel("油满时候可行驶"));
+    first_line->addWidget(new QLineEdit("**"));
+    first_line->addWidget(new QLabel("公里"));
+
+    QHBoxLayout *second_line=new QHBoxLayout();
+    second_line->addWidget(new QLabel("沿途有"));
+    second_line->addWidget(new QLineEdit("**"));
+    second_line->addWidget(new QLabel("加油站"));
+
+    int col=2 ,row=7;
+  /*  QGridLayout * grid=new QGridLayout;
+    grid->setHorizontalSpacing(col);
+    grid->setVerticalSpacing(row);
+*/
+    renew_area->addLayout(first_line);
+    renew_area->addLayout(second_line);
+    renew_area->addWidget(new QTableWidget(row,col,0));
+//end d2_1
+
+//d2_2
+    QHBoxLayout *but_area=new QHBoxLayout;
+
+    but_area->addWidget(but_start);
+    but_area->addWidget(but_stop);
+  //end d2_2
+    layout->addLayout(renew_area);
+    layout->addLayout(but_area);
 //! [9]
 /*    for (int i = 0; i < NumGridRows; ++i) {
         labels[i] = new QLabel(tr("Line %1:").arg(i + 1));
@@ -150,7 +200,6 @@ void Dialog::createrightView()
     layout->setColumnStretch(2, 20);
     */
     rightView->setLayout(layout);
-
 }
 
 //! [11]

@@ -40,7 +40,7 @@
 
 #ifndef DIALOG_H
 #define DIALOG_H
-
+#define MAX_SIZE   1024
 #include <QDialog>
 
 QT_BEGIN_NAMESPACE
@@ -73,11 +73,9 @@ private:
     void createleftbelowView();
     enum { NumGridRows = 3, NumButtons = 4 };
 
-    QMenuBar *menuBar;
-    QGroupBox *leftView;
-    QGroupBox *rightView;
-    QGroupBox *lefttopView;
-    QGroupBox *leftbelowView;
+
+
+
     QTextEdit *smallEditor;
     QTextEdit *bigEditor;
     QLabel *labels[NumGridRows];
@@ -87,6 +85,28 @@ private:
 
     QMenu *fileMenu;
     QAction *exitAction;
+//my  property
+private:
+    //ui compoment
+    QMenuBar *menuBar;
+    QGroupBox *leftView;
+    QGroupBox *rightView;
+    QGroupBox *lefttopView;
+    QGroupBox *leftbelowView;
+ QPushButton *but_stop;
+ QPushButton *but_start;
+    //
+    bool end_thread;
+    int   st_dis[MAX_SIZE];
+    int max_dis_full;
+    int st_num;
+public slots:
+    void onstart();
+    void onstop();
+public:
+    void renew_ui();
+
+
 };
 //! [0]
 
