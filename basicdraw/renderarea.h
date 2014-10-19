@@ -38,79 +38,55 @@
 **
 ****************************************************************************/
 
-#ifndef DIALOG_H
-#define DIALOG_H
-#include <QDialog>
-#include "source_area.h"
-#include "disview.h"
-QT_BEGIN_NAMESPACE
-class QAction;
-class QDialogButtonBox;
-class QGroupBox;
-class QLabel;
-class QLineEdit;
-class QMenu;
-class QMenuBar;
-class QPushButton;
-class QTextEdit;
-QT_END_NAMESPACE
+#ifndef RENDERAREA_H
+#define RENDERAREA_H
 
+#include <QBrush>
+#include <QPen>
+#include <QPixmap>
+#include <QWidget>
+QT_BEGIN_NAMESPACE
+    #define MAXSIZE 1024
+QT_END_NAMESPACE
 //! [0]
-class Dialog : public QDialog
+class RenderArea : public QWidget
 {
     Q_OBJECT
 
 public:
-    Dialog();
+    enum Shape { Line, Points, Polyline, Polygon, Rect, RoundedRect, Ellipse, Arc,
+                 Chord, Pie, Path, Text, Pixmap };
 
-private:
-    void createMenu();
-    void createleftView();
-    void createrightView();
-    void createFormGroupBox();
+    RenderArea(QWidget *parent = 0);
 
-    void createlefttopView();
-    void createleftbelowView();
-    enum { NumGridRows = 3, NumButtons = 4 };
+    QSize minimumSizeHint() const;
+    QSize sizeHint() const;
 
-
-
-
-    QTextEdit *smallEditor;
-    QTextEdit *bigEditor;
-    QLabel *labels[NumGridRows];
-    QLineEdit *lineEdits[NumGridRows];
-    QPushButton *buttons[NumButtons];
-    QDialogButtonBox *buttonBox;
-
-    QMenu *fileMenu;
-    QAction *exitAction;
-//my  property
-private:
-    //ui compoment
-    QMenuBar *menuBar;
-    QGroupBox *leftView;
-    QGroupBox *rightView;
- QPushButton *but_stop;
- QPushButton *but_start;
-    //
-    bool end_thread;
-    int   st_dis[MAX_SIZE];
-    int max_dis_full;
-    int st_num;
-    //algorithm core
-    bool if_renew;
-    int stime;
-    int gas_num; //time of fixing full of gas
 public slots:
-    void onstart();
-    void onstop();
-public:
-    void initValue();
-    void update_view();
-    void *travel();
-    static void* call_travel(void *arg);
+    void setShape(Shape shape);
+    void setPen(const QPen &pen);
+    void setBrush(const QBrush &brush);
+    void setAntialiased(bool antialiased);
+    void setTransformed(bool transformed);
+    void drawround_and_move (QPainter &painter,int *x,int *y,int station);
+    void drawround_and_move (QPainter &painter,int *x,int *y,int station);
+protected:
+    void paintEvent(QPaintEvent *event);
+
+private:
+    Shape shape;
+    QPen pen;
+    QBrush brush;
+    bool antialiased;
+    bool transformed;
+    QPixmap pixmap;
+private:
+    int scale;
+    int rads;
+    int maxsize;
+    int st_num;
+    int st_dis[MAXSIZE];
 };
 //! [0]
 
-#endif // DIALOG_H
+#endif // RENDERAREA_H

@@ -1,6 +1,6 @@
 #-------------------------------------------------
 #
-# Project created by QtCreator 2014-10-17T21:51:04
+# Project created by QtCreator 2014-10-19T00:03:21
 #
 #-------------------------------------------------
 
@@ -8,18 +8,18 @@ QT       += core gui
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
-TARGET = untitled
+TARGET = basicdraw
 TEMPLATE = app
 
 
 SOURCES += main.cpp\
-        dialog.cpp \
-        source_area.cpp \
-    disview.cpp
+        mainwindow.cpp \
+    renderarea.cpp
 
+HEADERS  += mainwindow.h \
+    renderarea.h
 
-HEADERS  += dialog.h \
-        source_area.h \
-    disview.h
-RESOURCES     = application.qrc
+FORMS    +=
 
+RESOURCES += \
+    basicdrawing.qrc
