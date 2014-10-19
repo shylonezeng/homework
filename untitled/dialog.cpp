@@ -39,12 +39,14 @@
 ****************************************************************************/
 
 #include <QtWidgets>
-
+#include <pthread.h>
+#include <unistd.h>
 #include "dialog.h"
 
 //! [0]
 Dialog::Dialog()
 {
+
     //init window size
     QRect rec = QApplication::desktop()->screenGeometry();
      int height = rec.height()*0.8;
@@ -58,43 +60,59 @@ Dialog::Dialog()
     createleftView();
     createrightView();
 //    createFormGroupBox();
-//! [0]
-
-//! [1]
-    bigEditor = new QTextEdit;
-    bigEditor->setPlainText(tr("This widget takes up all the remaining space "
-                               "in the top-level layout."));
-
-    buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok
-                                     | QDialogButtonBox::Cancel);
     //bind signal and slot
     connect(but_start, SIGNAL(clicked()), this, SLOT(onstart()));
     connect(but_stop, SIGNAL(clicked()), this, SLOT(onstop()));
-//! [1]
-
 //! [2]
     QHBoxLayout *mainLayout = new QHBoxLayout;
-//! [2] //! [3]
  //   mainLayout->setMenuBar(menuBar);
-//! [3] //! [4]
     mainLayout->addWidget(leftView,70,0);
     mainLayout->addWidget(rightView,30,0);
-  //  mainLayout->addWidget(formGroupBox);
-  //  mainLayout->addWidget(bigEditor);
-//    mainLayout->addWidget(buttonBox);
-//! [4] //! [5]
-//!
-//!
-    setLayout(mainLayout);
 
-    setWindowTitle(tr("Basic Layouts"));
+    setLayout(mainLayout);
+    setWindowTitle(tr("Greedy"));
+    //
+    initValue();
 }
+
+    //algorithm core value initialize
+void Dialog::initValue()
+{
+    if_renew=true;
+    stime=1000;
+    gas_num=0;
+
+}
+void Dialog::update_view()
+{
+ //  review top part and buttom part
+}
+void* Dialog::call_travel(void *arg)
+{
+    return reinterpret_cast<Dialog*>(arg)->travel();
+}
+void* Dialog::travel()
+{
+   while(!if_renew)
+   {
+       //some cal
+       gas_num++;
+       update_view();
+       sleep(stime);
+   }
+}
+
 //! [5]
 void Dialog::onstart()
-{}
+{
+    initValue();
+    pthread_t pthread;
+    pthread_create(&pthread,0,&Dialog::call_travel,this);
+}
+
 void Dialog::onstop()
 {
-
+    if_renew=false;
 }
 //! [6]
 void Dialog::createMenu()
@@ -112,33 +130,10 @@ void Dialog::createMenu()
 //! [7]
 void Dialog::createleftView()
 {
-    leftView = new QGroupBox(tr("left_layout"));
-    QVBoxLayout *layout = new QVBoxLayout;
-    createlefttopView();
-    createleftbelowView();
-    layout->addWidget(lefttopView);
-    layout->addWidget(leftbelowView);
-    /*
-    for (int i = 0; i < NumButtons; ++i) {
-        buttons[i] = new QPushButton(tr("Button %1").arg(i + 1));
-	layout->addWidget(buttons[i]);
-    }
-    */
-    leftView->setLayout(layout);
-}
-void Dialog::createlefttopView()
-{
-    QVBoxLayout
-         *layout=new QVBoxLayout;
-    layout->addWidget(new QLabel("加油次数："));
-    layout->addWidget(new QWidget);
-    lefttopView=new QGroupBox(tr("left top"));
-    lefttopView->setLayout(layout);//w=new QGroupBox(tr("left top view"));
-
-}
-void Dialog::createleftbelowView()
-{
-    leftbelowView=new QGroupBox(tr("left right view"));
+    leftView = new QGroupBox(tr("left_left_layout"));
+  //  QVBoxLayout *left_layout = new QVBoxLayout;
+    DisView* left_layout=new DisView();
+   leftView->setLayout(left_layout);
 }
 //! [7]
 
@@ -149,29 +144,8 @@ void Dialog::createrightView()
 //! [8]
 //!
     QVBoxLayout *layout = new QVBoxLayout;
-//d2_1
-    QVBoxLayout *renew_area =new QVBoxLayout();
 
-    QHBoxLayout *first_line =new QHBoxLayout();
-    first_line->addWidget(new QLabel("油满时候可行驶"));
-    first_line->addWidget(new QLineEdit("**"));
-    first_line->addWidget(new QLabel("公里"));
-
-    QHBoxLayout *second_line=new QHBoxLayout();
-    second_line->addWidget(new QLabel("沿途有"));
-    second_line->addWidget(new QLineEdit("**"));
-    second_line->addWidget(new QLabel("加油站"));
-
-    int col=2 ,row=7;
-  /*  QGridLayout * grid=new QGridLayout;
-    grid->setHorizontalSpacing(col);
-    grid->setVerticalSpacing(row);
-*/
-    renew_area->addLayout(first_line);
-    renew_area->addLayout(second_line);
-    renew_area->addWidget(new QTableWidget(row,col,0));
-//end d2_1
-
+    source_area *renew_area=new source_area;
 //d2_2
     QHBoxLayout *but_area=new QHBoxLayout;
 
@@ -180,40 +154,5 @@ void Dialog::createrightView()
   //end d2_2
     layout->addLayout(renew_area);
     layout->addLayout(but_area);
-//! [9]
-/*    for (int i = 0; i < NumGridRows; ++i) {
-        labels[i] = new QLabel(tr("Line %1:").arg(i + 1));
-        lineEdits[i] = new QLineEdit;
-        layout->addWidget(labels[i], i + 1, 0);
-        layout->addWidget(lineEdits[i], i + 1, 1);
-    }
-
-//! [9] //! [10]
-    smallEditor = new QTextEdit;
-    smallEditor->setPlainText(tr("This widget takes up about two thirds of the "
-                                 "grid layout."));
-    layout->addWidget(smallEditor, 0, 2, 4, 1);
-//! [10]
-
-//! [11]
-    layout->setColumnStretch(1, 10);
-    layout->setColumnStretch(2, 20);
-    */
     rightView->setLayout(layout);
 }
-
-//! [11]
-
-//! [12]
-/*
-void Dialog::createFormGroupBox()
-{
-    formGroupBox = new QGroupBox(tr("Form layout"));
-    QFormLayout *layout = new QFormLayout;
-    layout->addRow(new QLabel(tr("Line 1:")), new QLineEdit);
-    layout->addRow(new QLabel(tr("Line 2, long text:")), new QComboBox);
-    layout->addRow(new QLabel(tr("Line 3:")), new QSpinBox);
-    formGroupBox->setLayout(layout);
-}
-*/
-//! [12]
