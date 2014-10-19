@@ -86,7 +86,7 @@ private:
     bool transformed;
     QPixmap pixmap;
 private:
-    int global_scale;
+    float global_scale;
     int scale;
     int rads;
     int maxsize;

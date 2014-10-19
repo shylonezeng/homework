@@ -9,13 +9,13 @@ source_area::source_area()
     read_from_file();
     //init property members
     ledit_maxdis=new QLineEdit("4");
-    ledit_stnum=new QLineEdit("7") ;
+    ledit_stnum=new QLineEdit("6") ;
     int col=2 ,row=7;
     table=new QTableWidget(row,col,0);
     table->setItem(1,1,new QTableWidgetItem("debuging"));
     table->setHorizontalHeaderItem(0,new QTableWidgetItem("区间"));
     table->setHorizontalHeaderItem(1,new QTableWidgetItem("距离"));
-    this->on_stnm_input("7");
+    this->on_stnm_input("6");
     //d2_1
     // QVBoxLayout *renew_area =new QVBoxLayout();
 
@@ -82,12 +82,12 @@ void source_area::on_stnm_input(const QString & stnum) //do not use stunum argum
     if(!ok)
     return;
     */
-    int row=text_from_edit(*ledit_stnum);
+    int row=text_from_edit(*ledit_stnum)+1;
     if(row<0)
         return;
 
     table->setRowCount(row);
-    if(row>32)
+    if(row>31)
     {
         ledit_stnum->setText("num should be less than 32");
         return;

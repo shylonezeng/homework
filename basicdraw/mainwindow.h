@@ -59,12 +59,6 @@ class DrawPart : public QWidget
 
 public:
     DrawPart();
-
-private slots:
-    void shapeChanged();
-    void penChanged();
-    void brushChanged();
-
 private:
     RenderArea *renderArea;
     QLabel *shapeLabel;

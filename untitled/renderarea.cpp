@@ -29,7 +29,7 @@ void RenderArea::update_ui(int st)
 //! [8]
 bool RenderArea::reset_members(int maxsize,int st_num,int *st_dis)
 {
-    global_scale=1;
+    global_scale=0.8;
     rads=10*global_scale;
     scale=30*global_scale;
 
@@ -89,7 +89,7 @@ void RenderArea::drawround_and_move (QPainter &painter,int *x,int *y)
             sprintf(msg,"Destination");
         else
             sprintf(msg,"station %d",flag_drawtext);
-        painter.drawText(QRect(*x,*y+2*rads,150,height), Qt::AlignLeft, tr(msg));
+        painter.drawText(QRect(*x-20,*y+2*rads,150,height), Qt::AlignLeft, tr(msg));
         flag_drawtext++;
 
     //    painter.restore();
@@ -131,7 +131,7 @@ void RenderArea::once_draw(QPainter& painter,int draw_to)
     QRect rect(0, 0, 20,20);
     //   painter.translate(x,y);
     //  painter.drawRect(rect);
-    int x=width()*0.1,y=this->height()/2;
+    int x=width()*0.05,y=this->height()/2;
     this->drawround_and_move(painter,&x,&y);
     for (int i=0;i<draw_to;++i)
     {
