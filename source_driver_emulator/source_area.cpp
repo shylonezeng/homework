@@ -136,9 +136,11 @@ bool source_area::get_input(int *st_dis,int *st_num,int *maxdis)
     for(int i=0;i<=*st_num;++i)
     {
         bool ok;
-        int ret=table->itemAt(i,2)->text().toInt(&ok);
+        QString str=(table->item(i,1))->text();
+        qDebug()<<"getdata:"<<str;
+        int ret=str.toInt(&ok);
         if(!ok)
-            return false;
+           return false;
         st_dis[i]=ret;
     }
     return true;
@@ -147,7 +149,7 @@ bool source_area::get_input(int *st_dis,int *st_num,int *maxdis)
 
 bool    source_area::read_from_file()
 {
-    int temp[MAX_SIZE]={2,2,3,4,5,1,6,6,
+    int temp[MAX_SIZE]={2,2,3,4,3,1,3,3,
 2,1,3,4,2,3,1,2,
 4,3,2,3,2,4,1,4,
 12,2,23,2,23,21,23,2
