@@ -43,6 +43,10 @@
 #include <QDialog>
 #include "source_area.h"
 #include "disview.h"
+#include <pthread.h>
+#include <unistd.h>
+#include <QtWidgets>
+
 QT_BEGIN_NAMESPACE
 class QAction;
 class QDialogButtonBox;
@@ -55,6 +59,7 @@ class QPushButton;
 class QTextEdit;
 QT_END_NAMESPACE
 
+//extern int if_add;
 //! [0]
 class Dialog : public QDialog
 {
@@ -91,24 +96,31 @@ private:
     QMenuBar *menuBar;
     QGroupBox *leftView;
     QGroupBox *rightView;
+   source_area *input_area;
+    DisView *left_disview;
  QPushButton *but_stop;
  QPushButton *but_start;
     //
     bool end_thread;
-    int   st_dis[MAX_SIZE];
-    int max_dis_full;
-    int st_num;
+    pthread_t pthread;
     //algorithm core
     bool if_renew;
     int stime;
-    int gas_num; //time of fixing full of gas
+    int   st_dis[MAX_SIZE];
+    int max_dis_full;
+    int st_num;
+public:
+   // int gas_num; //time of fixing full of gas
+signals:
+    void signal_update(int value,int gas_add);
 public slots:
+    void update_view(int value,int gas_add);
     void onstart();
     void onstop();
 public:
     void initValue();
-    void update_view();
     void *travel();
+    bool readValue();
     static void* call_travel(void *arg);
 };
 //! [0]
