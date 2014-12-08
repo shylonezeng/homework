@@ -4,8 +4,16 @@
 #include <string>
 #include <cstring>
 #include <vector>
+#include <math.h>
+#include <map>
+#include <utility>
 
+#ifndef debug
 #define debug
+#endif
+#define ivector vector<int>
+// typedef vector<int> ivector;
+
 // #include <
 //
 using namespace std;
@@ -15,8 +23,14 @@ class CGraph{
 		int node_num; //number  of graph nodes
 		int arc_num;	//number of graph arc
 		int **mt;	// use two halt triangle part to store arc infomation
+
+		//
+
 	private:
 		bool * visit_flag;
+		typedef vector<vector<int> >  adjNodes_type;
+		adjNodes_type adjNodes;
+		int p_adj;
 		void destroy();
 	public:
 		CGraph();
@@ -34,6 +48,12 @@ class CGraph{
 		void setNode(int node_num);
 		void setArc(int **arcs);
 		void show();
+
+		void setNextNodes();
+		void resetNextNodes();
+		int nextNode(int , int *);
+		int getWestest(){ return 0;}
+		int getEastest(){ return node_num-1;}
 };
 
 CGraph::~CGraph(){
@@ -51,7 +71,9 @@ CGraph::CGraph(int node_num)
 {
 	this->node_num=node_num;
 	this->arc_num=0;
+	this->p_adj=0;
 	setNode(node_num);
+
 }
 void CGraph::setNode(int node_num)
 {
@@ -67,7 +89,7 @@ void CGraph::setNode(int node_num)
 	for(int i=0;i<this->node_num;++i){
 
 		mt[i]=new int[this->node_num];
-// 		visit_flag[i]=new bool[this->node_num];
+		// 		visit_flag[i]=new bool[this->node_num];
 	}
 
 	memset(mt,sizeof(int)*node_num*node_num,0);
@@ -120,13 +142,46 @@ void CGraph::destroy(){
 	for(int i=0;i<node_num;++i){
 		if(mt[i])
 			delete mt[i];
-// 		if(visit_flag[i])
-// 			delete visit_flag[i];
+		// 		if(visit_flag[i])
+		// 			delete visit_flag[i];
 	}
-// 	if(mt)
-// 		delete mt;
-// 	if(visit_flag)
-// 		delete visit_flag;
+	// 	if(mt)
+	// 		delete mt;
+	// 	if(visit_flag)
+	// 		delete visit_flag;
+}
+void CGraph::setNextNodes(){
+	for(int i=0;i<node_num;++i)
+	{
+		vector<int> oneNode_adj;
+		for(int j=i+1;j<node_num;++j){
+
+			if(!mt[i][j])
+				continue;
+			oneNode_adj.push_back(j);	
+		}
+		this->adjNodes.push_back(oneNode_adj);
+	}		
+}
+void CGraph::resetNextNodes(){
+	for(int i=0;i<node_num;++i)
+	{
+		vector<int>& oneNode_adj=this->adjNodes[i];
+		oneNode_adj.clear();
+
+		for(int j=i-1;j>=0;--j){
+
+			if(!mt[i][j] )
+				continue;
+			oneNode_adj.push_back(j);	
+		}
+	}		
+}
+int CGraph::nextNode(int cur_node, int *which_one){
+	vector<int>& oneNode_adj=this->adjNodes[cur_node];	
+	if((*which_one)>=oneNode_adj.size())
+		return -1;
+	return oneNode_adj[(*which_one)++];
 }
 
 template <typename MylistType>
@@ -136,60 +191,159 @@ void printArray(MylistType list){
 		cout<<*iter<<" ";
 	cout<<endl;
 }
+
+class CLog{
+
+}bestPath;
+
+typedef vector<int> V;
+void vcopy(V &des, V source){
+	des.clear();
+	V::iterator iter=source.begin();
+	while(iter!=source.end())
+	{
+		des.push_back(*iter);
+	}
+}
+// typedef vector<vector<int>> Log_t;
+typedef pair<vector<int>,int> key_type;
+typedef vector<int> value_of_path;
+typedef map<key_type,value_of_path> Log_t;
+// bool back_path=false;
+
+bool recurse(CGraph &g,Log_t &log,vector<int> visited_flag,vector<int> &path,int cur_node){
+	//
+
+	// 	if(back_path){
+	// 		g.resetNextNodes();
+	// 		back_path=false;
+	// 	}
+	//
+	path.push_back(cur_node);
+	visited_flag[cur_node]=1;
+	//end recursion condition	
+	if(cur_node==g.getWestest()){
+		return true;
+	}
+
+	//if loged then return;
+	key_type key=key_type(visited_flag,cur_node);
+	Log_t::iterator iter=log.find(key);
+	if(iter!=log.end() ){
+		vcopy(path,log[key]);
+		return false;
+	}		
+	// the best path
+	int maxPsbyNodes=0;
+	vector<int> bestPath;
+	//
+	int which_adj=0;
+	int nNode=g.nextNode(cur_node,&which_adj);
+
+	while(nNode!=-1){
+		vector<int> tempPath(path);	//copy of path. !!! may deallocted before referred
+		recurse(g,log,visited_flag,tempPath,nNode);
+		int len=tempPath.size();
+		if(len<=maxPsbyNodes){
+			maxPsbyNodes=len;
+			bestPath=tempPath;
+		}
+
+		nNode=g.nextNode(cur_node,&which_adj);
+	}
+	//deep copy the best
+	path=bestPath;
+	//if not loged, then log;
+	log[key]=path;	
+
+	if(cur_node==g.getEastest()){
+		g.resetNextNodes();
+	}
+	return false; //not returned  back
+}
 /*search path function*/
-vector<int>& search_path(CGraph &g){//maybe some erro can happen when it returns a reference type
- 	#ifdef debug
-		cout<<"call function  search_path"<<endl;
-	#endif
+bool search_path(CGraph &g, ivector& bestPath){//maybe some erro can happen when it returns a reference type
+#ifdef debug
+	cout<<"call function  search_path"<<endl;
+#endif
+	int  node_num=g.node_num;
+	if(g.node_num<=1)
+		return false ;
 	/*start node can be visited 2 times*/
-	g.setVisitFlag(0,2);
-	int max_passby=node_num-1;
+	// 	g.setVisitFlag(0,2);
+	// 	int max_passby=node_num-1;
 	//each row index means number of nodes passed from source node to destination node
 	//min number start with index 1;
 	//log element logs next visit node 
-	int **log = new int*[max_passby+1]; 
-	log[0]=NULL;
+	// 	int log_length=(int)pow(2,n);
+	Log_t log;
+	vector<int> visited_flag(node_num,0);
+	// 	vector<int> path;
+	int maxPsbyNodes=0;
+// 	vector<int> bestPath;
+
+	g.setNextNodes();
+
+	int which_one=0;
+	int nNode=g.nextNode(0,&which_one);
+	while(nNode!=-1){
+		vector<int> path;
+		recurse(g,log,visited_flag,path,nNode);
+		int len=path.size();
+		if(len>maxPsbyNodes){
+			maxPsbyNodes=len;
+			bestPath=path;
+		}
+		nNode=g.nextNode(0,&which_one);
+	}
+	// be sure to print out all elements
+	return true;
 	/*nodes passed by can be 1 to max_passby*/
 	//when number of nodes passby is one;
-	int psby=1;
-	for(int p_node=1;p_node<node_num;p_node++){
-		log[psby]=new int[node_num];
-		memset(log[psby],0,sizeof(int)*node_num);
-		
-		if(g.mt[0][p_node])
-			log[psby][p_node]=1;
-	}
-/*没有考虑每个节点只能访问一次的问题*/
-	for(psby=1;psby<=max_passby;++psby){
-		log[psby]=new int[node_num];
-		memset(log[psby],0,sizeof(int)*node_num);
-		
-		for(int p_node=1;p_node<node_num;p_node++){
-			//find Adjacent node and evalue weather can pass by it 
-			//can not be involed in visitd node set
-			for(int adj=1;adj<node_num;adj++){
-				if(is adjacent node ||  if involed in visited path){
-					if(!canReach(adjnode))
-					
-				}
-			}
-		}	
-	}
-	/*find longest path*/
-		
 }
+/*end search function*/
 
+
+// {
+// 	int psby=1;
+// 	for(int p_node=1;p_node<node_num;p_node++){
+// 		log[psby]=new int[node_num];
+// 		memset(log[psby],0,sizeof(int)*node_num);
+// 		
+// 		if(g.mt[0][p_node])
+// 			log[psby][p_node]=1;
+// 	}
+// /*没有考虑每个节点只能访问一次的问题*/
+// 	for(psby=1;psby<=max_passby;++psby){
+// 		log[psby]=new int[node_num];
+// 		memset(log[psby],0,sizeof(int)*node_num);
+// 		
+// 		for(int p_node=1;p_node<node_num;p_node++){
+// 			//find Adjacent node and evalue weather can pass by it 
+// 			//can not be involed in visitd node set
+// 			for(int adj=1;adj<node_num;adj++){
+// 				if(is adjacent node ||  if involed in visited path){
+// 					if(!canReach(adjnode))
+// 					
+// 				}
+// 			}
+// 		}	
+// 	}
+// 	/*find longest path*/
+// 		
+// }
 
 
 /*main function*/ 
 int main(int argc,char** argv)
 {
 #ifdef debug
-	 ifstream cin("input");
+	ifstream cin("input");
 #endif
 	int node_num,arc_num;
 	CGraph g;
 	/*create graph*/
+	ivector path;
 	while(cin>>node_num>>arc_num)	{
 		cout<<"arc_num: "<<arc_num<<endl;
 		g.setNode(node_num);
@@ -201,10 +355,9 @@ int main(int argc,char** argv)
 		}
 		g.show();
 		/*search the travel path*/
-		typedef vector<int> ivector;
-		ivector path=search_path(g);
-//		printArray<ivector>(path);
+		 search_path(g,path);
 	}
+	printArray<ivector>(path);
 	return 0;
 	/*reallocate new resource*/
 	//descontrutor function do complete this task
