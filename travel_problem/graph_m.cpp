@@ -8,11 +8,10 @@
 #include <map>
 #include <utility>
 
-
-#define ivector vector<int>
 #ifndef debug
-  #define debug
+#define debug
 #endif
+#define ivector vector<int>
 // typedef vector<int> ivector;
 
 // #include <
@@ -217,7 +216,6 @@ void vcopy(V &des, V source){
 	while(iter!=source.end())
 	{
 		des.push_back(*iter);
-		iter++;
 	}
 }
 // typedef vector<vector<int>> Log_t;
@@ -249,9 +247,7 @@ bool recurse(CGraph &g,Log_t &log,vector<int> visited_flag,vector<int> &path,int
 	key_type key=key_type(visited_flag,cur_node);
 	Log_t::iterator iter=log.find(key);
 	if(iter!=log.end() ){
-#ifdef debug
-		cout<<"++++loged,need not continue"<<endl;
-#endif
+		cout<<"loged,need not continue"<<endl;
 		vcopy(path,log[key]);
 		return true;
 	}
@@ -278,6 +274,7 @@ bool recurse(CGraph &g,Log_t &log,vector<int> visited_flag,vector<int> &path,int
 		}
 		nNode=g.nextNode(cur_node,&which_adj,dir);
 	}
+	printArray<ivector>(bestPath);
 	//deep copy the best
 	path=bestPath;
 	//if not loged, then log;
@@ -286,7 +283,6 @@ bool recurse(CGraph &g,Log_t &log,vector<int> visited_flag,vector<int> &path,int
 	{
 #ifdef debug
 		cout<<"this node get the best path"<<endl;
-		printArray<ivector>(bestPath);
 #endif
 		return true;
 	}
@@ -300,14 +296,22 @@ bool search_path(CGraph &g, ivector& bestPath){//maybe some erro can happen when
 	int  node_num=g.node_num;
 	if(g.node_num<=1)
 		return false ;
+	/*start node can be visited 2 times*/
+	// 	g.setVisitFlag(0,2);
+	// 	int max_passby=node_num-1;
+	//each row index means number of nodes passed from source node to destination node
+	//min number start with index 1;
+	//log element logs next visit node
+	// 	int log_length=(int)pow(2,n);
 	Log_t log;
 	vector<int> visited_flag(node_num,0);
+	// 	vector<int> path;
 	int maxPsbyNodes=0;
+	// 	vector<int> bestPath;
 
-	//initialize the adjcent nodes of each node
 	g.setNextNodes();
 	g.resetNextNodes();
-	/*deep in priority to search*/
+
 	bool direction=0;
 	int which_one=0;
 	int nNode=g.nextNode(0,&which_one,direction);
@@ -332,24 +336,54 @@ bool search_path(CGraph &g, ivector& bestPath){//maybe some erro can happen when
 }
 /*end search function*/
 
+
+// {
+// 	int psby=1;
+// 	for(int p_node=1;p_node<node_num;p_node++){
+// 		log[psby]=new int[node_num];
+// 		memset(log[psby],0,sizeof(int)*node_num);
+//
+// 		if(g.mt[0][p_node])
+// 			log[psby][p_node]=1;
+// 	}
+// /*没有考虑每个节点只能访问一次的问题*/
+// 	for(psby=1;psby<=max_passby;++psby){
+// 		log[psby]=new int[node_num];
+// 		memset(log[psby],0,sizeof(int)*node_num);
+//
+// 		for(int p_node=1;p_node<node_num;p_node++){
+// 			//find Adjacent node and evalue weather can pass by it
+// 			//can not be involed in visitd node set
+// 			for(int adj=1;adj<node_num;adj++){
+// 				if(is adjacent node ||  if involed in visited path){
+// 					if(!canReach(adjnode))
+//
+// 				}
+// 			}
+// 		}
+// 	}
+// 	/*find longest path*/
+//
+// }
+
+
 /*main function*/
 int main(int argc,char** argv)
 {
-
+	
+#ifdef debug
 #define MAXSIZE_FILENAME 50
 	char default_file[MAXSIZE_FILENAME]="input";
 	char *test_file=default_file;
 	if(argc>=2)
 		test_file=argv[1];
 	ifstream cin(test_file);
-	if(argc==3 && (argv[2]=="--debug"||argv[2]=="-d")){	
-	}
+#endif
 	int node_num,arc_num;
 	CGraph g;
-
-	/*create graph and find the best path from source node to destination node*/
+	/*create graph*/
 	while(cin>>node_num>>arc_num)	{
-
+		cout<<"arc_num: "<<arc_num<<endl;
 		g.setNode(node_num);
 		for(int i=0;i<arc_num;++i){
 			int arc_value=0;
@@ -357,10 +391,7 @@ int main(int argc,char** argv)
 			cin>>snode>>enode;
 			g.addArc(snode,enode);
 		}
-#ifdef debug	
-		cout<<"arc_num: "<<arc_num<<endl;
 		g.show();
-#endif
 		/*search the travel path*/
 		ivector path;
 		if(search_path(g,path)){
@@ -368,8 +399,9 @@ int main(int argc,char** argv)
 			printArray<ivector>(path);
 		}
 	}
-	/*reallocate new resource*/
-	//no such resorse need to be deallocated
+// 	cout<<"path size:"<<path.size()<<"\t end functoin main. "<<endl;
 	return 0;
+	/*reallocate new resource*/
+	//descontrutor function do complete this task
 }
 /*end main*/
