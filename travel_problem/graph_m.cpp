@@ -8,10 +8,11 @@
 #include <map>
 #include <utility>
 
-#ifndef debug
-	#define debug
-#endif
+
 #define ivector vector<int>
+#ifndef debug
+  #define debug
+#endif
 // typedef vector<int> ivector;
 
 // #include <
@@ -193,8 +194,15 @@ int CGraph::nextNode(int cur_node, int *which_one,bool dir){
 template <typename MylistType>
 void printArray(MylistType list){
 	typename MylistType::iterator iter=list.begin();
-	while((iter++)!=list.end())
-		cout<<*iter<<" ";
+	if(iter==list.end())
+		return ;
+	cout<<*iter;
+	iter++;
+	while(iter!=list.end())
+	{
+		cout<<"->"<<*iter;
+		iter++;
+	}
 	cout<<endl;
 }
 
@@ -209,6 +217,7 @@ void vcopy(V &des, V source){
 	while(iter!=source.end())
 	{
 		des.push_back(*iter);
+		iter++;
 	}
 }
 // typedef vector<vector<int>> Log_t;
@@ -218,23 +227,15 @@ typedef map<key_type,value_of_path> Log_t;
 // bool back_path=false;
 
 bool recurse(CGraph &g,Log_t &log,vector<int> visited_flag,vector<int> &path,int cur_node,bool dir){
-	//
-
-	// 	if(back_path){
-	// 		g.resetNextNodes();
-	// 		back_path=false;
-	// 	}
-	//sf
-
 	//cout<<"visiting node:"<<cur_node<<endl;
 	// system("paus");
 
-			cout<<"tempPath:"<<endl;
-			printArray<ivector>(path);
-
-
 	path.push_back(cur_node);
 	visited_flag[cur_node]=1;
+#ifdef debug
+	// 			cout<<"tempPath:"<<endl;
+	// 			printArray<ivector>(path);
+#endif
 	//end recursion condition
 	if(cur_node==g.getWestest()){
 		return true;
@@ -248,9 +249,11 @@ bool recurse(CGraph &g,Log_t &log,vector<int> visited_flag,vector<int> &path,int
 	key_type key=key_type(visited_flag,cur_node);
 	Log_t::iterator iter=log.find(key);
 	if(iter!=log.end() ){
-		cout<<"loged,need not continue"<<endl;
+#ifdef debug
+		cout<<"++++loged,need not continue"<<endl;
+#endif
 		vcopy(path,log[key]);
-		return false;
+		return true;
 	}
 	// the best path
 	int maxPsbyNodes=0;
@@ -260,12 +263,14 @@ bool recurse(CGraph &g,Log_t &log,vector<int> visited_flag,vector<int> &path,int
 
 	int nNode=g.nextNode(cur_node,&which_adj,dir);
 
+	bool can_reach=false;
 	while(nNode!=-1){
 		if(!visited_flag[nNode]){
 			vector<int> tempPath(path);	//copy of path. !!! may deallocted before referred
 			recurse(g,log,visited_flag,tempPath,nNode,dir);
 			int len=tempPath.size();
-			if(len<=maxPsbyNodes){
+			// 			cout<<"tempPath size:"<<len<<endl;
+			if(len>maxPsbyNodes){
 				maxPsbyNodes=len;
 				bestPath=tempPath;
 			}
@@ -273,13 +278,18 @@ bool recurse(CGraph &g,Log_t &log,vector<int> visited_flag,vector<int> &path,int
 		}
 		nNode=g.nextNode(cur_node,&which_adj,dir);
 	}
-// 	cout<<"bestPath:"<<endl;
-// 	printArray<ivector>(bestPath);
 	//deep copy the best
 	path=bestPath;
 	//if not loged, then log;
 	log[key]=path;
-
+	if(maxPsbyNodes>0)
+	{
+#ifdef debug
+		cout<<"this node get the best path"<<endl;
+		printArray<ivector>(bestPath);
+#endif
+		return true;
+	}
 	return false; //not returned  back
 }
 /*search path function*/
@@ -290,22 +300,14 @@ bool search_path(CGraph &g, ivector& bestPath){//maybe some erro can happen when
 	int  node_num=g.node_num;
 	if(g.node_num<=1)
 		return false ;
-	/*start node can be visited 2 times*/
-	// 	g.setVisitFlag(0,2);
-	// 	int max_passby=node_num-1;
-	//each row index means number of nodes passed from source node to destination node
-	//min number start with index 1;
-	//log element logs next visit node
-	// 	int log_length=(int)pow(2,n);
 	Log_t log;
 	vector<int> visited_flag(node_num,0);
-	// 	vector<int> path;
 	int maxPsbyNodes=0;
-// 	vector<int> bestPath;
 
+	//initialize the adjcent nodes of each node
 	g.setNextNodes();
 	g.resetNextNodes();
-
+	/*deep in priority to search*/
 	bool direction=0;
 	int which_one=0;
 	int nNode=g.nextNode(0,&which_one,direction);
@@ -322,55 +324,32 @@ bool search_path(CGraph &g, ivector& bestPath){//maybe some erro can happen when
 		nNode=g.nextNode(0,&which_one,direction);
 	}
 	// be sure to print out all elements
+	if(maxPsbyNodes<=0)
+		return false;
 	return true;
 	/*nodes passed by can be 1 to max_passby*/
 	//when number of nodes passby is one;
 }
 /*end search function*/
 
-
-// {
-// 	int psby=1;
-// 	for(int p_node=1;p_node<node_num;p_node++){
-// 		log[psby]=new int[node_num];
-// 		memset(log[psby],0,sizeof(int)*node_num);
-//
-// 		if(g.mt[0][p_node])
-// 			log[psby][p_node]=1;
-// 	}
-// /*没有考虑每个节点只能访问一次的问题*/
-// 	for(psby=1;psby<=max_passby;++psby){
-// 		log[psby]=new int[node_num];
-// 		memset(log[psby],0,sizeof(int)*node_num);
-//
-// 		for(int p_node=1;p_node<node_num;p_node++){
-// 			//find Adjacent node and evalue weather can pass by it
-// 			//can not be involed in visitd node set
-// 			for(int adj=1;adj<node_num;adj++){
-// 				if(is adjacent node ||  if involed in visited path){
-// 					if(!canReach(adjnode))
-//
-// 				}
-// 			}
-// 		}
-// 	}
-// 	/*find longest path*/
-//
-// }
-
-
 /*main function*/
 int main(int argc,char** argv)
 {
-#ifdef debug
-	ifstream cin("input");
-#endif
+
+#define MAXSIZE_FILENAME 50
+	char default_file[MAXSIZE_FILENAME]="input";
+	char *test_file=default_file;
+	if(argc>=2)
+		test_file=argv[1];
+	ifstream cin(test_file);
+	if(argc==3 && (argv[2]=="--debug"||argv[2]=="-d")){	
+	}
 	int node_num,arc_num;
 	CGraph g;
-	/*create graph*/
-	ivector path;
+
+	/*create graph and find the best path from source node to destination node*/
 	while(cin>>node_num>>arc_num)	{
-		cout<<"arc_num: "<<arc_num<<endl;
+
 		g.setNode(node_num);
 		for(int i=0;i<arc_num;++i){
 			int arc_value=0;
@@ -378,23 +357,19 @@ int main(int argc,char** argv)
 			cin>>snode>>enode;
 			g.addArc(snode,enode);
 		}
+#ifdef debug	
+		cout<<"arc_num: "<<arc_num<<endl;
 		g.show();
+#endif
 		/*search the travel path*/
-		search_path(g,path);
+		ivector path;
+		if(search_path(g,path)){
+			cout<<"final best path: 0->";
+			printArray<ivector>(path);
+		}
 	}
-	path.clear();
-
-	// // path.push_back(0);
-	// path.push_back(1);
-	// path.push_back(2);
-	// path.push_back(3);
-
-	printArray<ivector>(path);
-
-
-	cout<<"path size:"<<path.size()<<"\t end functoin main. "<<endl;
-	return 0;
 	/*reallocate new resource*/
-	//descontrutor function do complete this task
+	//no such resorse need to be deallocated
+	return 0;
 }
 /*end main*/
