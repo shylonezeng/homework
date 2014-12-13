@@ -1,0 +1,35 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.9~svn20110310	//
+BUFFSIZE	my_lib/mylib.h	16;"	d
+LIBPATH	Makefile	/^LIBPATH = my_lib\/mylib.cpp$/;"	m
+LISTENQ	my_lib/mylib.h	18;"	d
+MAXLINE	my_lib/mylib.h	15;"	d
+MAXSIZE	daytime_client.cpp	4;"	d	file:
+MAXSIZE	daytime_ser.cpp	8;"	d	file:
+MAX_EVENT_NUMBER	daytime_ser.cpp	81;"	d	file:
+PORT	my_lib/mylib.h	19;"	d
+SA	my_lib/mylib.h	17;"	d
+Sigfunc	daytime_ser.cpp	/^typedef void Sigfunc(int);$/;"	t	file:
+_mylib_h	my_lib/mylib.h	3;"	d
+addfd	daytime_ser.cpp	/^void addfd(int epollfd,int fd,bool one_shot){$/;"	f
+clients	daytime_ser.cpp	/^int clients[MAXSIZE];$/;"	v
+cur_pos	daytime_ser.cpp	/^int cur_pos=0;$/;"	v
+dealWithCommand	daytime_client.cpp	/^bool dealWithCommand(char *com,int len){$/;"	f
+err_dump	my_lib/mylib.cpp	/^void err_dump(const char* fmt,... )$/;"	f
+err_msg	my_lib/mylib.cpp	/^void err_msg(const char *fmt,...)$/;"	f
+err_quit	my_lib/mylib.cpp	/^void err_quit(const char* fmt,...)$/;"	f
+err_ret	my_lib/mylib.cpp	/^void err_ret(const char * fmt,...)$/;"	f
+err_sys	my_lib/mylib.cpp	/^void err_sys(const char * fmt,...)$/;"	f
+main	daytime_client.cpp	/^int main(int argc, char ** argv)$/;"	f
+main	daytime_ser.cpp	/^int main(int argc, char ** argv)$/;"	f
+max	my_lib/mylib.h	21;"	d
+min	my_lib/mylib.h	20;"	d
+setnoblock	daytime_ser.cpp	/^int setnoblock(int fd){$/;"	f
+sig_chld	daytime_ser.cpp	/^void sig_chld(int sigid)$/;"	f
+signal	daytime_ser.cpp	/^Sigfunc* signal(int sgid, Sigfunc *func)$/;"	f
+str_cli	daytime_client.cpp	/^void str_cli(FILE * fp, int sockfd)$/;"	f
+wrongCommand	daytime_client.cpp	/^void wrongCommand()$/;"	f
